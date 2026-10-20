@@ -1,4 +1,0 @@
-Joan,Rose,Milk,12,240
-Mercy,Bella,Eggs,22,330
-Diana,Ngutez,Flour,3,480
-Joan,Rose,Bread,17,1105
