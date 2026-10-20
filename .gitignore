@@ -1,0 +1,6 @@
+inventory.txt
+sales_history.txt
+restock_alerts.txt
+kiosk.txt
+__pycache__/
+*.pyc
