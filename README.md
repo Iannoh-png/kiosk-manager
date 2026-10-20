@@ -59,4 +59,4 @@ Classes and objects, encapsulation, composition, single responsibility, packages
 
 ## Author
 
-Your Name Here
+Ian Waweru Kariuki
