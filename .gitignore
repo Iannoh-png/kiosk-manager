@@ -4,3 +4,4 @@ restock_alerts.txt
 kiosk.txt
 __pycache__/
 *.pyc
+models/try.py
