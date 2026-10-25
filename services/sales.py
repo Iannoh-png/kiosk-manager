@@ -30,11 +30,16 @@ class SalesService:
             return new_employee
 
     def make_sale(self, inventory, product_name, quantity, customer_name, employee_name):
-        if not inventory.has_sufficient_stock(product_name, quantity):
-            print(f"Not enough stock for {product_name}.")
-            return None
-
+        
         product = inventory.get_product(product_name)
+
+        if product is None:
+            return None, f"{product_name} not found in inventory. "
+
+        if not product.has_sufficient_stock(quantity):
+            return None, f"Not enough stock. Only {product.quantity} {product_name} left."
+
+        
         customer = self.get_or_create_customer(customer_name)
         employee = self.get_or_create_employee(employee_name)
         sale = Sale(product, quantity, customer, employee)
@@ -45,7 +50,18 @@ class SalesService:
         self.sales_log.append(sale)
         self.unique_products.add(product.name)
 
-        return sale
+        return sale, None
+
+    def get_report(self):
+        best_product, best_qty = self.best_seller()
+        return {
+            "sales": self.sales_log,
+            "total_revenue": self.total_revenue(),
+            "unique_count": len(self.unique_products),
+            "best_product": best_product,
+            "best_qty": best_qty,
+            "top_employee": self.top_employee(),
+        }
 
 
     def total_revenue(self):
@@ -53,6 +69,12 @@ class SalesService:
         for sale in self.sales_log:
             total += sale.total_price
         return total
+    def customer_leaderboard(self):
+        return sorted(self.customers.values(), key=lambda c: c.total_spent, reverse=True)
+
+    def employee_leaderboard(self):
+        return sorted(self.employees.values(), key=lambda e: e.total_sales, reverse=True)
+    
 
     def best_seller(self):
         totals_by_product = {}
@@ -78,6 +100,11 @@ class SalesService:
             if best is None or employee.total_sales > best.total_sales:
                 best = employee
         return best
+    
+    def save_sale(self, sale, filename="sales_history.txt"):
+            file = open(filename, "a")
+            file.write(f"{sale.customer.name},{sale.employee.name},{sale.product.name},{sale.quantity_sold},{sale.total_price}\n")
+            file.close()
 
     def print_report(self):
         print("\n========== SALES REPORT ==========")
@@ -111,6 +138,52 @@ class SalesService:
                     customer.record_purchase(int(total))
                     employee.record_sale(int(total))
         file.close()
+
+    def read_history(self, filename="sales_history.txt"):
+        rows = []
+        if not os.path.exists(filename):
+            return rows
+        file = open(filename, "r")
+        for line in file:
+            parts = line.strip().split(",")
+            if len(parts) == 5:
+                customer, employee, product, qty, total = parts
+                rows.append({
+                    "Customer": customer,
+                    "Employee": employee,
+                    "Product": product,
+                    "Quantity": int(qty),
+                    "Total (KES)": int(total),
+                })
+        file.close()
+        return rows
+
+    def get_history_report(self, filename="sales_history.txt"):
+        rows = self.read_history(filename)
+
+        total_revenue = 0
+        qty_by_product = {}
+        for row in rows:
+            total_revenue +=  row["Total (KES)"]
+            product = row["Product"]
+            qty_by_product[product] = qty_by_product.get(product, 0) + row["Quantity"]
+
+        best_product = None
+        best_qty = 0
+        for product, qty in qty_by_product.items():
+            if qty > best_qty:
+                best_qty = qty
+                best_product = product
+
+        return {
+            "rows": rows,
+            "total_revenue": total_revenue,
+            "unique_count": len(qty_by_product),
+            "best_product": best_product,
+            "best_qty": best_qty,
+            "qty_by_product": qty_by_product,
+            "top_employee": self.top_employee(),
+        }
         
 
 
@@ -119,3 +192,5 @@ class SalesService:
         for sale in self.sales_log:
             file.write(f"{sale.customer.name},{sale.employee.name},{sale.product.name},{sale.quantity_sold},{sale.total_price}\n")
         file.close()
+
+    

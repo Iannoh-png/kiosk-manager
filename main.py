@@ -77,7 +77,10 @@ def main():
             qty = get_valid_number("How many units? ")
             customer_name = clean_text(input("Customer name? "))
             employee_name = clean_text(input("Which employee is serving "))
-            sales.make_sale(inventory, name, qty, customer_name, employee_name)
+            sale, error = sales.make_sale(inventory, name, qty, customer_name, employee_name)
+            if error:
+                print(error)
+            else:print(f"Sold! {sale}")
 
         elif choice == 4:
             sales.print_report()

@@ -11,9 +11,10 @@ class Inventory:
     def restock_product(self, name, amount):
         if name in self.products:
             self.products[name].restock(amount)
+            return True
+        return False
 
-        else:
-            print(f"{name} not found in inventory.")
+       
 
     def get_product(self, name):
         return self.products.get(name)
@@ -29,6 +30,19 @@ class Inventory:
         print(f"{'Product': <15}{'Price':<10}{'Quantity':<10}")
         for product in self.products.values():
             print(f"{product.name:<15}{product.price:<10}{product.quantity:<10}")
+
+    def get_all_products(self):
+        return list(self.products.values())
+
+    def search(self, term):
+        term = term.strip().lower()
+        if term == "":
+            return[]
+        results = []
+        for product in self.products.values():
+            if term in product.name.lower():
+                results.append(product)
+        return results
 
     def low_stock_items(self, threshold=5):
         low = []
@@ -67,5 +81,5 @@ class Inventory:
                 name, price, qty = line.split(",")
                 self.add_product(name, int(price), int(qty))
 
-            file.close()
-            return True
+        file.close()
+        return True
