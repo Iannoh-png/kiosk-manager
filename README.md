@@ -1,7 +1,9 @@
 # Kiosk Manager
-![Kiosk Manager web app](screenshot.png)
+
 
 An inventory and sales management system for a small Nairobi kiosk, written in Python. It began as a single-file command-line capstone and was rebuilt with classes, services and a package structure, then given a web interface using Streamlit.
+
+![Kiosk Manager web app](screenshot.png)
 
 The same core code powers both versions: a terminal menu (`main.py`) and a web app (`app.py`).
 
